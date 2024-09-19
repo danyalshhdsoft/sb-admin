@@ -89,7 +89,11 @@ export class AppService {
         `Admin with email ${existingAdmin.email} already exists`,
       );
     }
-    return await this.adminModel.create(user);
+    const hashPass = await this.hashPassword(user.password);
+    return await this.adminModel.create({
+      ...user,
+      password: hashPass
+    });
   }
 
   async hashPassword(password: string) {
@@ -137,7 +141,7 @@ export class AppService {
     admin: Admin,
     candidatePassword: string,
   ): Promise<boolean> {
-    return candidatePassword === admin.password;
+    return bcrypt.compare(candidatePassword, admin.password);
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {
