@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { GetUserRequest } from './get-user-request.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -51,7 +51,7 @@ export class AppService {
       user.email,
     );
     if (!admin) {
-      throw new RpcException('Admin not found');
+      throw new HttpException('Admin not found', HttpStatus.BAD_REQUEST);
     }
 
     const matchPassword = await this.comparePassword(
@@ -137,7 +137,7 @@ export class AppService {
     admin: Admin,
     candidatePassword: string,
   ): Promise<boolean> {
-    return bcrypt.compare(candidatePassword, admin.password);
+    return candidatePassword === admin.password;
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {

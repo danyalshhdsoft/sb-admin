@@ -1,4 +1,4 @@
-import moment from 'moment';
+import * as moment from 'moment';
 import { Admin } from 'src/schema/admin.schema';
 import { Role } from 'src/schema/role.schema';
 

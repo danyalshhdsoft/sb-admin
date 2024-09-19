@@ -13,16 +13,16 @@ export class AppController {
 
   @MessagePattern('admin_login')
   async adminLogin(data: any) {
-    return await this.appService.signin(data.value);
+    return await this.appService.signin(data.value)
+      .then(result => result)
+      .catch(error => error)
   }
 
   @MessagePattern('admin_signup')
   async adminSignUp(data: any) {
-    return await this.appService.register(data.value);
-  }
-
-  @MessagePattern('register')
-  async register(data: any) {
-    return await this.appService.register(data.value);
+    return await this.appService.register(data.value)
+      .then(result => result)
+      .catch(error => error);
   }
 }
+
