@@ -24,5 +24,18 @@ export class AppController {
       .then(result => result)
       .catch(error => error);
   }
-}
 
+  @MessagePattern('admin_create_role')
+  async adminCreateRole(data: any) {
+    return await this.appService.createRole(data.value.name, data.value.permission)
+      .then(result => result)
+      .catch(error => error);
+  }
+
+  @MessagePattern('admin_update_role')
+  async adminUpdateRole(data: any) {
+    return await this.appService.updateRole(data.value.isIdDTO, data.value.updateRoleDTO)
+      .then(result => result)
+      .catch(error => error);
+  }
+}

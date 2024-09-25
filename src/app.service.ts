@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nes
 import { GetUserRequest } from './get-user-request.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User } from './schema/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { RegisterUserDto } from './dto/auth.dto';
@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { AdminJWTPayload } from './interface/admin-jwt-payload';
 import { JWT_SECRET_ADMIN } from './utils/constants';
 import { AdminBinding } from './dto/admin.binding';
+import { Role } from './schema/role.schema';
 //import { EmailService } from './email/email.service';
 
 @Injectable()
@@ -25,6 +26,7 @@ export class AppService {
     @InjectModel(User.name) private adminModel: Model<Admin>,
     private readonly configService: ConfigService,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Role.name) private adminRole: Model<Role>,
   ) { }
 
   private readonly users: any[] = [
@@ -71,11 +73,11 @@ export class AppService {
     const secret = this.configService.get<string>(JWT_SECRET_ADMIN);
     const accessToken = await this.jwtService.signAsync(payload, { secret });
     const adminInfo = new AdminBinding(admin);
-    return { 
+    return {
       status: 201,
       data: {
         accessToken,
-        admin: adminInfo 
+        admin: adminInfo
       }
     };
   }
@@ -142,6 +144,23 @@ export class AppService {
     candidatePassword: string,
   ): Promise<boolean> {
     return bcrypt.compare(candidatePassword, admin.password);
+  }
+
+  async createRole(
+    name: string,
+    permissions: any
+  ) {
+    const role = await this.adminRole.create({ name, permissions });
+    return role;
+  }
+
+  async updateRole(isIdDto: mongoose.Types.ObjectId, updateRoleDTO: any) {
+    const role = await this.adminRole.findByIdAndUpdate(
+      isIdDto.id,
+      updateRoleDTO,
+      { new: true },
+    );
+    return role;
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {

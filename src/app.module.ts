@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from './schema/user.schema';
 import { OtpTokensModule } from './otp-tokens/otp-tokens.module';
+import { Role, RoleSchema } from './schema/role.schema';
 //import { EmailModule } from './email/email.module';
 
 @Module({
@@ -37,6 +38,7 @@ import { OtpTokensModule } from './otp-tokens/otp-tokens.module';
       }),
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Role.name, schema: RoleSchema }]),
     OtpTokensModule,
     //EmailModule,
   ],
