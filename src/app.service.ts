@@ -15,6 +15,7 @@ import { AdminJWTPayload } from './interface/admin-jwt-payload';
 import { JWT_SECRET_ADMIN } from './utils/constants';
 import { AdminBinding } from './dto/admin.binding';
 import { Role } from './schema/role.schema';
+import ApiResponse from './utils/api-response-utils';
 //import { EmailService } from './email/email.service';
 
 @Injectable()
@@ -53,15 +54,16 @@ export class AppService {
       user.email,
     );
     if (!admin) {
-      throw new HttpException('Admin not found', HttpStatus.BAD_REQUEST);
+      return new ApiResponse({message: "Admin not found"}, 400)
     }
 
     const matchPassword = await this.comparePassword(
       admin,
       user.password,
     );
+    
     if (!matchPassword) {
-      throw new RpcException('Invalid Credentials');
+      return new ApiResponse({message: "Incorrect Password"}, 400);
     }
     const payload: AdminJWTPayload = {
       id: String(admin._id),
@@ -73,13 +75,10 @@ export class AppService {
     const secret = this.configService.get<string>(JWT_SECRET_ADMIN);
     const accessToken = await this.jwtService.signAsync(payload, { secret });
     const adminInfo = new AdminBinding(admin);
-    return {
-      status: 201,
-      data: {
-        accessToken,
-        admin: adminInfo
-      }
-    };
+    return new ApiResponse({
+      accessToken,
+      admin: adminInfo
+    }, 200);
   }
 
   async register(user: RegisterUserDto) {
@@ -92,10 +91,12 @@ export class AppService {
       );
     }
     const hashPass = await this.hashPassword(user.password);
-    return await this.adminModel.create({
+    await this.adminModel.create({
       ...user,
       password: hashPass
     });
+
+    return new ApiResponse({message: "User Created Successfully"}, 201);
   }
 
   async hashPassword(password: string) {
@@ -143,7 +144,7 @@ export class AppService {
     admin: Admin,
     candidatePassword: string,
   ): Promise<boolean> {
-    return bcrypt.compare(candidatePassword, admin.password);
+    return await bcrypt.compare(candidatePassword, admin.password);
   }
 
   async createRole(
@@ -151,7 +152,10 @@ export class AppService {
     permissions: any
   ) {
     const role = await this.adminRole.create({ name, permissions });
-    return role;
+    return {
+      status: 201,
+      data: role
+    };
   }
 
   async updateRole(isIdDto: mongoose.Types.ObjectId, updateRoleDTO: any) {
@@ -160,7 +164,10 @@ export class AppService {
       updateRoleDTO,
       { new: true },
     );
-    return role;
+    return {
+      status: 200,
+      data: role
+    };
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {
