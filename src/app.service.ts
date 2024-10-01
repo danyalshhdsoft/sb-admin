@@ -16,6 +16,7 @@ import { JWT_SECRET_ADMIN } from './utils/constants';
 import { AdminBinding } from './dto/admin.binding';
 import { Role } from './schema/role.schema';
 import ApiResponse from './utils/api-response-utils';
+import { aggregatePaginate } from './utils/pagination.service';
 //import { EmailService } from './email/email.service';
 
 @Injectable()
@@ -45,14 +46,15 @@ export class AppService {
     return 'Hello World!';
   }
 
-  getUser(getUserRequest: GetUserRequest) {
-    return this.users.find((user) => user.userId === getUserRequest.userId);
+  async getUser(getUserRequest: GetUserRequest) {
+    return await this.adminModel.findOne({_id: getUserRequest.userId});
   }
 
   async signin(user: any) {
     const admin: Admin = await this.findByEmail(
       user.email,
     );
+    
     if (!admin) {
       return new ApiResponse({message: "Admin not found"}, 400)
     }
@@ -75,10 +77,16 @@ export class AppService {
     const secret = this.configService.get<string>(JWT_SECRET_ADMIN);
     const accessToken = await this.jwtService.signAsync(payload, { secret });
     const adminInfo = new AdminBinding(admin);
-    return new ApiResponse({
-      accessToken,
-      admin: adminInfo
-    }, 200);
+
+    return {
+      status: 200,
+      data: {
+        data: {
+          accessToken,
+          admin: adminInfo
+        }
+      }
+    }
   }
 
   async register(user: RegisterUserDto) {
@@ -96,7 +104,12 @@ export class AppService {
       password: hashPass
     });
 
-    return new ApiResponse({message: "User Created Successfully"}, 201);
+    return {
+      status: 201,
+      data: {
+        message: "User Created Successfully"
+      }
+    }
   }
 
   async hashPassword(password: string) {
@@ -152,15 +165,12 @@ export class AppService {
     permissions: any
   ) {
     const role = await this.adminRole.create({ name, permissions });
-    return {
-      status: 201,
-      data: role
-    };
+    return new ApiResponse(role, 201);
   }
 
   async updateRole(isIdDto: mongoose.Types.ObjectId, updateRoleDTO: any) {
     const role = await this.adminRole.findByIdAndUpdate(
-      isIdDto.id,
+      isIdDto,
       updateRoleDTO,
       { new: true },
     );
@@ -168,6 +178,19 @@ export class AppService {
       status: 200,
       data: role
     };
+  }
+
+  async getRoles(page: string, limit: string) {
+    const roles = await aggregatePaginate(
+      this.adminRole,
+      [],
+      Number(page),
+      Number(limit),
+    );
+    return {
+      status: 200,
+      data: roles
+    }
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {

@@ -18,7 +18,7 @@ import { Role, RoleSchema } from './schema/role.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '24h' },
       }),
     }),
     MongooseModule.forRootAsync({
