@@ -41,6 +41,10 @@ export class RegisterUserDto {
 
   @IsString()
   @IsNotEmpty()
+  companyName: string;
+
+  @IsString()
+  @IsNotEmpty()
   whatsAppPhone: string;
 
   @IsEnum(GENDER)

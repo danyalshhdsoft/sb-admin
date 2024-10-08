@@ -26,9 +26,9 @@ export class AppController {
       .catch(error => error)
   }
 
-  @MessagePattern(EVENT_TOPICS.ADMIN_SIGNUP)
-  async adminSignUp(data: any) {
-    return await this.appService.register(data.value)
+  @MessagePattern(EVENT_TOPICS.REGISTER_AGENCY_QUERY)
+  async registerAgencyQuery(data: any) {
+    return await this.appService.registerQuery(data.value)
       .then(result => result)
       .catch(error => error);
   }

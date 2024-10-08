@@ -17,6 +17,7 @@ import { AdminBinding } from './dto/admin.binding';
 import { Role } from './schema/role.schema';
 import ApiResponse from './utils/api-response-utils';
 import { aggregatePaginate } from './utils/pagination.service';
+import { AgencyEnquiry } from './schema/agency-enquiry.schema';
 //import { EmailService } from './email/email.service';
 
 @Injectable()
@@ -26,6 +27,7 @@ export class AppService {
     private jwtService: JwtService,
     private verificationCodeService: OtpTokensService,
     @InjectModel(User.name) private adminModel: Model<Admin>,
+    @InjectModel(AgencyEnquiry.name) private agencyEnquiryModel: Model<AgencyEnquiry>,
     private readonly configService: ConfigService,
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Role.name) private adminRole: Model<Role>,
@@ -89,17 +91,21 @@ export class AppService {
     }
   }
 
-  async register(user: RegisterUserDto) {
-    const existingAdmin = await this.adminModel.findOne({
+  async registerQuery(user: RegisterUserDto) {
+
+    const existingAgencyEnquiry = await this.agencyEnquiryModel.findOne({
       email: user.email,
     });
-    if (existingAdmin) {
-      throw new RpcException(
-        `Admin with email ${existingAdmin.email} already exists`,
-      );
+    if (existingAgencyEnquiry) {
+      return {
+        status: 500,
+        data: {
+          message: `Agency with email ${existingAgencyEnquiry.email} already exists`
+        }
+      }
     }
     const hashPass = await this.hashPassword(user.password);
-    await this.adminModel.create({
+    await this.agencyEnquiryModel.create({
       ...user,
       password: hashPass
     });
@@ -107,7 +113,7 @@ export class AppService {
     return {
       status: 201,
       data: {
-        message: "User Created Successfully"
+        message: "Enquiry Submitted Succesfully"
       }
     }
   }
