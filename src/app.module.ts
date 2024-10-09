@@ -8,6 +8,8 @@ import { User, UserSchema } from './schema/user.schema';
 import { OtpTokensModule } from './otp-tokens/otp-tokens.module';
 import { Role, RoleSchema } from './schema/role.schema';
 import { AgencyEnquiry, AgencyEnquirySchema } from './schema/agency-enquiry.schema';
+import { Agency, AgencySchema } from './schema/agency.schema';
+import { Admin, AdminSchema } from './schema/admin.schema';
 //import { EmailModule } from './email/email.module';
 
 @Module({
@@ -38,8 +40,10 @@ import { AgencyEnquiry, AgencyEnquirySchema } from './schema/agency-enquiry.sche
         },
       }),
     }),
+    MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Role.name, schema: RoleSchema }]),
+    MongooseModule.forFeature([{ name: Agency.name, schema: AgencySchema }]),
     MongooseModule.forFeature([{ name: AgencyEnquiry.name, schema: AgencyEnquirySchema }]),
     OtpTokensModule,
     //EmailModule,

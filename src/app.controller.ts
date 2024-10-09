@@ -33,6 +33,13 @@ export class AppController {
       .catch(error => error);
   }
 
+  @MessagePattern(EVENT_TOPICS.CREATE_AGENCY)
+  async createAgency(data: any) {
+    return await this.appService.createAgency(data.value)
+      .then(result => result)
+      .catch(error => error);
+  }
+
   @MessagePattern(EVENT_TOPICS.ADMIN_CREATE_ROLE)
   async adminCreateRole(data: any) {
     console.log(JSON.stringify(data.value.permissions));

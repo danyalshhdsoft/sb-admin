@@ -56,12 +56,8 @@ export class Admin extends Document {
   })
   status: string;
 
-  @Prop({
-    default: null,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: Role.name,
-  })
-  role: Role;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role', default: null })
+  role: mongoose.Types.ObjectId;
 
   @Prop({ default: null, type: Date })
   deletedAt: Date;

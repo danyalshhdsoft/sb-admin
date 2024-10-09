@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nes
 import { GetUserRequest } from './get-user-request.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Mongoose, Schema, Types } from 'mongoose';
 import { User } from './schema/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { RegisterUserDto } from './dto/auth.dto';
@@ -18,6 +18,10 @@ import { Role } from './schema/role.schema';
 import ApiResponse from './utils/api-response-utils';
 import { aggregatePaginate } from './utils/pagination.service';
 import { AgencyEnquiry } from './schema/agency-enquiry.schema';
+import { AgencyUserDto } from './dto/agency.dto';
+import { Agency } from './schema/agency.schema';
+import { AGENCY_OWNER, constructAgencyOwnerRole } from './utils/common';
+import { ADMIN_ACCOUNT_STATUS } from './enums/admin.account.status.enum';
 //import { EmailService } from './email/email.service';
 
 @Injectable()
@@ -26,7 +30,8 @@ export class AppService {
   constructor(
     private jwtService: JwtService,
     private verificationCodeService: OtpTokensService,
-    @InjectModel(User.name) private adminModel: Model<Admin>,
+    @InjectModel(Admin.name) private adminModel: Model<Admin>,
+    @InjectModel(Agency.name) private agencyModel: Model<Agency>,
     @InjectModel(AgencyEnquiry.name) private agencyEnquiryModel: Model<AgencyEnquiry>,
     private readonly configService: ConfigService,
     @InjectModel(User.name) private userModel: Model<User>,
@@ -197,6 +202,40 @@ export class AppService {
       status: 200,
       data: roles
     }
+  }
+
+  async createAgency(agency: AgencyUserDto) {
+    try {
+      const password = await this.hashPassword(agency.password);
+      const owner = {
+        email: agency.email,
+        username: agency.email,
+        firstName: agency.firstName,
+        lastName: agency.lastName,
+        password,
+        isSuperAdmin: false,
+        status: ADMIN_ACCOUNT_STATUS.ACTIVE,
+        role: new mongoose.Types.ObjectId(AGENCY_OWNER)
+      };
+      
+      await this.adminModel.create(owner);
+      await this.agencyModel.create(agency);  
+    }
+    catch(err) {
+      return {
+        status: 400,
+        data: {
+          message: err.message
+        } 
+      }
+    }
+    
+    return {
+      status: 200,
+      data: {
+        message: "Agency created"
+      }
+    };
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {
