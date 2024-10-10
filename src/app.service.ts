@@ -207,6 +207,7 @@ export class AppService {
   async createAgency(agency: AgencyUserDto) {
     try {
       const password = await this.hashPassword(agency.password);
+      const agencyModel = await this.agencyModel.create(agency);  
       const owner = {
         email: agency.email,
         username: agency.email,
@@ -215,11 +216,10 @@ export class AppService {
         password,
         isSuperAdmin: false,
         status: ADMIN_ACCOUNT_STATUS.ACTIVE,
-        role: new mongoose.Types.ObjectId(AGENCY_OWNER)
+        role: new mongoose.Types.ObjectId(AGENCY_OWNER),
+        agencyId: agencyModel.id
       };
-      
       await this.adminModel.create(owner);
-      await this.agencyModel.create(agency);  
     }
     catch(err) {
       return {
@@ -236,6 +236,49 @@ export class AppService {
         message: "Agency created"
       }
     };
+  }
+
+  async updateAgency(agency: AgencyUserDto) {
+    try {
+      //const password = await this.hashPassword(agency.password);
+      const agencyModel = await this.agencyModel.findOneAndUpdate(agency);
+    }
+    catch(err) {
+      return {
+        status: 400,
+        data: {
+          message: err.message
+        } 
+      }
+    }
+    
+    return {
+      status: 200,
+      data: {
+        message: "Agency updated"
+      }
+    };
+  }
+
+  async deleteAgency(isIdDto: mongoose.Types.ObjectId) {
+    try {
+      await this.agencyModel.deleteOne({_id: isIdDto});
+      await this.adminModel.deleteMany({ agencyId: isIdDto });
+    } catch(err) {
+      return {
+        status: 400,
+        data: {
+          message: err.message
+        }
+      }
+    }
+    
+    return {
+      status: 200,
+      data: {
+        message: "Succesfully Delete"
+      }
+    }
   }
 
   // async createAdmin(adminSignUpDto: AdminSignupDto) {

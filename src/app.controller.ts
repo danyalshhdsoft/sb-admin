@@ -40,6 +40,20 @@ export class AppController {
       .catch(error => error);
   }
 
+  @MessagePattern(EVENT_TOPICS.DELETE_AGENCY)
+  async deleteAgency(data: any) {
+    return await this.appService.deleteAgency(data.value)
+      .then(result => result)
+      .catch(error => error);
+  }
+
+  @MessagePattern(EVENT_TOPICS.UPDATE_AGENCY)
+  async updateAgency(data: any) {
+    return await this.appService.updateAgency(data.value)
+      .then(result => result)
+      .catch(error => error);
+  }
+
   @MessagePattern(EVENT_TOPICS.ADMIN_CREATE_ROLE)
   async adminCreateRole(data: any) {
     console.log(JSON.stringify(data.value.permissions));

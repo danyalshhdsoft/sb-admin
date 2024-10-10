@@ -59,6 +59,9 @@ export class Admin extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role', default: null })
   role: mongoose.Types.ObjectId;
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, default: null })
+  agencyId?: mongoose.Types.ObjectId;
+
   @Prop({ default: null, type: Date })
   deletedAt: Date;
 }
