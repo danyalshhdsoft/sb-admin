@@ -58,8 +58,6 @@ export class AppService {
   }
 
   async signin(user: any) {
-    console.log("coming here");
-
     const admin: Admin = await this.findByEmail(
       user.email,
     );
@@ -74,7 +72,7 @@ export class AppService {
     );
 
     console.log(matchPassword);
-    
+
     if (!matchPassword) {
       return { status: 400, data: { message: "Incorrect Password"}};
     }
@@ -129,8 +127,7 @@ export class AppService {
   }
 
   async hashPassword(password: string) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
     return hashedPassword;
   }
 
@@ -176,7 +173,7 @@ export class AppService {
     console.log(candidatePassword);
     console.log(admin.password);
 
-    return await bcrypt.compare(candidatePassword, admin.password);
+    return await bcrypt.compare(candidatePassword, admin?.password);
   }
 
   async createRole(
@@ -214,7 +211,7 @@ export class AppService {
 
   async createAgency(agency: AgencyUserDto) {
     try {
-      const password = await this.hashPassword(agency.password);
+      const password = (await this.hashPassword(agency.password)).toString();
       const agencyModel = await this.agencyModel.create(agency);  
       const owner = {
         email: agency.email,
@@ -227,6 +224,7 @@ export class AppService {
         role: new mongoose.Types.ObjectId(AGENCY_OWNER),
         agencyId: agencyModel.id
       };
+      
       await this.adminModel.create(owner);
     }
     catch(err) {

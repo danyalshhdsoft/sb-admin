@@ -77,7 +77,7 @@ AdminSchema.virtual('fullName').get(function (this: {
 
 AdminSchema.pre<AdminDocument>('save', async function (next) {
   // password hash
-  if (this.password) this.password = await bcrypt.hash(this.password, 10);
+  //if (this.password) this.password = await bcrypt.hash(this.password, 10);
 
   if (!this.username) {
     let username = this.email.split('@')[0];
