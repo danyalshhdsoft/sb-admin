@@ -58,22 +58,27 @@ export class AppService {
   }
 
   async signin(user: any) {
+    console.log("coming here");
+
     const admin: Admin = await this.findByEmail(
       user.email,
     );
     
     if (!admin) {
-      return new ApiResponse({message: "Admin not found"}, 400)
+      return { status: 400, data: { message: "Admin not found"}};
     }
 
     const matchPassword = await this.comparePassword(
       admin,
       user.password,
     );
+
+    console.log(matchPassword);
     
     if (!matchPassword) {
-      return new ApiResponse({message: "Incorrect Password"}, 400);
+      return { status: 400, data: { message: "Incorrect Password"}};
     }
+    
     const payload: AdminJWTPayload = {
       id: String(admin._id),
       username: admin.username,
@@ -168,6 +173,9 @@ export class AppService {
     admin: Admin,
     candidatePassword: string,
   ): Promise<boolean> {
+    console.log(candidatePassword);
+    console.log(admin.password);
+
     return await bcrypt.compare(candidatePassword, admin.password);
   }
 
