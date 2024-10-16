@@ -22,6 +22,7 @@ import { AgencyUserDto } from './dto/agency.dto';
 import { Agency } from './schema/agency.schema';
 import { AGENCY_OWNER, constructAgencyOwnerRole } from './utils/common';
 import { ADMIN_ACCOUNT_STATUS } from './enums/admin.account.status.enum';
+import { CreateSuperAdminDto } from './dto/create-super-admin.dto';
 //import { EmailService } from './email/email.service';
 
 @Injectable()
@@ -207,6 +208,20 @@ export class AppService {
       status: 200,
       data: roles
     }
+  }
+
+  async createSuperAdmin(admin: CreateSuperAdminDto) {
+    const password = (await this.hashPassword(admin.password)).toString();
+    const superAdmin = {
+      email: admin.email,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      password,
+      isSuperAdmin: true,
+      status: ADMIN_ACCOUNT_STATUS.ACTIVE,
+    };
+    
+    await this.adminModel.create(superAdmin);
   }
 
   async createAgency(agency: AgencyUserDto) {
