@@ -287,6 +287,11 @@ export class AppService {
     }
   }
 
+  async getRoleById(isIdDto: mongoose.Types.ObjectId) {
+    const role = await this.adminRole.findOne({_id: isIdDto});
+    return role;
+  }
+
   // async createAdmin(adminSignUpDto: AdminSignupDto) {
   //   const existingAdmin = await this.adminModel.findOne({
   //     email: adminSignUpDto.email,

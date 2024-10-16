@@ -14,6 +14,7 @@ export class AppController {
 
   @MessagePattern('get_admin')
   async getUser(data: any) {
+    //console.log(data);
     return await this.appService.getUser(data.value)
       .then(res => res)
       .catch(err => err);
@@ -72,6 +73,13 @@ export class AppController {
   @MessagePattern(EVENT_TOPICS.ADMIN_GET_ROLES)
   async getRoles(data: any) {
     return await this.appService.getRoles(data.value.page, data.value.limit)
+      .then(result => result)
+      .catch(error => error);
+  }
+
+  @MessagePattern(EVENT_TOPICS.ADMIN_GET_ROLE_BY_ID)
+  async getRoleById(data: any) {
+    return await this.appService.getRoleById(data.value.sub)
       .then(result => result)
       .catch(error => error);
   }
