@@ -41,6 +41,13 @@ export class AppController {
       .catch(error => error);
   }
 
+  @MessagePattern(EVENT_TOPICS.CREATE_SUPER_ADMIN)
+  async createSuperAdmin(data: any) {
+    return await this.appService.createSuperAdmin(data.value)
+      .then(result => result)
+      .catch(error => error);
+  }
+
   @MessagePattern(EVENT_TOPICS.DELETE_AGENCY)
   async deleteAgency(data: any) {
     return await this.appService.deleteAgency(data.value)
